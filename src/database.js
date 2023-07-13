@@ -10,6 +10,7 @@ const conection = mysql.createConnection({
   database: "passpoint",
   user: user,
   password: pass,
+  ssl: true,
 });
 
 conection.connect((err) => {

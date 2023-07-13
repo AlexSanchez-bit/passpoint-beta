@@ -1,4 +1,4 @@
-const tolerance = 80;
+const tolerance = 100;
 
 function hashcode(points, _varphi) {
   let total_hash = "";
