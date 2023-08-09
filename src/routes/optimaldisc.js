@@ -1,6 +1,6 @@
-const tolerance = 100;
+const tolerance = 0.1;
 
-function hashcode(points, _varphi) {
+function hashcode(points, _varphi, scale) {
   let total_hash = "";
   for (let i = 0; i < points.length; i++) {
     total_hash += optimal_discretization(
@@ -8,33 +8,36 @@ function hashcode(points, _varphi) {
       points[i][1],
       _varphi[i][0],
       _varphi[i][1],
+      scale,
     );
   }
   return (total_hash);
 }
 
-function getVarphi(points) {
+function getVarphi(points, scale) {
   let return_array = new Array();
+  const _tolerance = Math.trunc(tolerance * scale);
   for (let i = 0; i < points.length; i++) {
     const x = points[i][0];
     const y = points[i][1];
 
-    let fi = (x % (2 * tolerance)) >= (tolerance)
-      ? x % tolerance
-      : (x % (2 * tolerance)) - tolerance;
+    let fi = (x % (2 * _tolerance)) >= (_tolerance)
+      ? x % _tolerance
+      : (x % (2 * _tolerance)) - _tolerance;
 
-    let fiy = (y % (2 * tolerance)) >= (tolerance)
-      ? y % tolerance
-      : (y % (2 * tolerance)) - tolerance;
+    let fiy = (y % (2 * _tolerance)) >= (_tolerance)
+      ? y % _tolerance
+      : (y % (2 * _tolerance)) - _tolerance;
 
     return_array.push([fi, fiy]);
   }
   return return_array;
 }
 
-function optimal_discretization(x, y, fi, fiy) {
-  let hash = Math.floor((x - fi) / (2 * tolerance)).toString();
-  hash += Math.floor((y - fiy) / (2 * tolerance)).toString();
+function optimal_discretization(x, y, fi, fiy, scale) {
+  const _tolerance = Math.trunc(tolerance * scale);
+  let hash = Math.trunc((x - fi) / (2 * _tolerance)).toString();
+  hash += Math.trunc((y - fiy) / (2 * _tolerance)).toString();
   return hash;
 }
 

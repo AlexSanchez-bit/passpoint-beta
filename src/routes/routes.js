@@ -1,5 +1,6 @@
 "use strict";
 const { Router } = require("express");
+const sharp = require("sharp");
 const path = require("path");
 const multer = require("multer");
 const cloudinary = require("cloudinary");
@@ -18,6 +19,8 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+
+const { encryptObject, decryptObject } = require("./cript.js");
 
 const { hashcode, getVarphi, tolerance } = require("./optimaldisc.js");
 
@@ -42,9 +45,9 @@ routes.post("/login", (req, resp) => {
           error: "usuario o contrasena incorrectos",
         });
       }
-      const varphi = JSON.parse(results[0].phi);
+      const { varphi, scale } = decryptObject(results[0].phi);
       const passpoint = results[0].passpoint;
-      if (passpoint == hashcode(obj_points, varphi)) {
+      if (passpoint == hashcode(obj_points, varphi, scale)) {
         const accessToken = logger.get_accesstoken({
           email,
           username: results[0].usuario,
@@ -72,12 +75,17 @@ routes.post("/singup", uploads.single("image"), async (req, resp) => {
     resp.send({ accesstoken: undefined, error: "rellene todos los campos" });
     return;
   }
+  const { width, height } = await sharp(
+    _default
+      ? path.join(__dirname, "../public", process.env.DEF_IMG)
+      : req.file.path,
+  ).metadata();
+  const scale = Math.min(width, height);
+  const varphi = getVarphi(obj_points, scale);
+  const passcode = hashcode(obj_points, varphi, scale);
+  const lit_varphi = encryptObject({ varphi, scale });
 
-  const varphi = getVarphi(obj_points);
-  const passcode = hashcode(obj_points, varphi);
-  const lit_varphi = JSON.stringify(varphi);
-
-  if (passcode != hashcode(obj_conf, varphi)) {
+  if (passcode != hashcode(obj_conf, varphi, scale)) {
     resp.send({
       accesstoken: undefined,
       error: "las contrasenas no coinciden",
@@ -124,7 +132,6 @@ routes.post("/singup", uploads.single("image"), async (req, resp) => {
               return;
             }
             const accessToken = logger.get_accesstoken({ email, username });
-            console.log("Access Token:", accessToken);
             resp.send({ accesstoken: accessToken, error: "none" });
           },
         );
@@ -137,14 +144,20 @@ routes.get("/tolerance", (req, res) => {
   res.send({ tolerance });
 });
 
-routes.post("/update/:at", uploads.single("image"), (req, res) => {
+routes.post("/update/:at", uploads.single("image"), async (req, res) => {
   const { at } = req.params;
   const { points, confirmation, _default } = req.body;
   const obj_points = JSON.parse(points);
   const obj_conf = JSON.parse(confirmation);
-  const varphi = getVarphi(obj_points);
-  const passcode = hashcode(obj_points, varphi);
-  const lit_varphi = JSON.stringify(varphi);
+  const { width, height } = await sharp(
+    _default
+      ? path.join(__dirname, "../public", process.env.DEF_IMG)
+      : req.file.path,
+  ).metadata();
+  const scale = Math.min(width, height);
+  const varphi = getVarphi(obj_points, scale);
+  const passcode = hashcode(obj_points, varphi, scale);
+  const lit_varphi = encryptObject({ varphi, scale });
   const { email } = logger.verify(at);
 
   if (passcode != hashcode(obj_conf, varphi)) {

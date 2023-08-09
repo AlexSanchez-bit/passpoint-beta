@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const secretKey = "gh0_mpv098-90"; // La misma clave secreta utilizada para firmar el token
+const secretKey = process.env.KEY; // La misma clave secreta utilizada para firmar el token
 class logger {
   constructor() {
   }
