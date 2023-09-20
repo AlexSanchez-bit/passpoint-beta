@@ -1,17 +1,15 @@
 const mysql = require("mysql");
 require("dotenv").config();
 
-const host = process.env.DB_HOST;
-const user = process.env.DB_USER;
-const pass = process.env.DB_PASW;
-const name = process.env.DB_NAME;
+const host = "localhost" | process.env.DB_HOST;
+const user = "localhost" | process.env.DB_USER;
+const pass = "localhost" | process.env.DB_PASW;
 
 const conection = mysql.createConnection({
-  host: host,
-  database: name,
-  user: user,
-  password: pass,
-  ssl: true,
+  host: "localhost",
+  database: "passpoint",
+  user: "root",
+  password: "abc",
 });
 
 conection.connect((err) => {
