@@ -10,9 +10,9 @@ const conection = mysql.createConnection({
   database: "passpoint",
   user,
   password,
-  ssl: {
-    rejectUnauthorized: false // Esto desactiva la verificación SSL/TLS
-  }
+//  ssl: {
+//    rejectUnauthorized: false // Esto desactiva la verificación SSL/TLS
+//  }
 });
 
 conection.connect((err) => {
