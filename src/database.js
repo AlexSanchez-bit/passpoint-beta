@@ -1,15 +1,18 @@
 const mysql = require("mysql");
 require("dotenv").config();
 
-const host = "localhost" | process.env.DB_HOST;
-const user = "localhost" | process.env.DB_USER;
-const pass = "localhost" | process.env.DB_PASW;
+const host =  process.env.DB_HOST;
+const user =  process.env.DB_USER;
+const password =  process.env.DB_PASW;
 
 const conection = mysql.createConnection({
-  host: "localhost",
+  host,
   database: "passpoint",
-  user: "root",
-  password: "abc",
+  user,
+  password,
+  ssl: {
+    rejectUnauthorized: false // Esto desactiva la verificación SSL/TLS
+  }
 });
 
 conection.connect((err) => {

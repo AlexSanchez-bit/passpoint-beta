@@ -15,7 +15,7 @@ app.use(require("./routes/images_routes.js"));
 app.use(require("./routes/petitions.js"));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("*", (req, res) => {
+app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
